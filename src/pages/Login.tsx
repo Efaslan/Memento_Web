@@ -8,7 +8,6 @@ export default function Login() {
   // Local states for form inputs and UI feedback
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   
   // Hooks for navigation and global authentication state
@@ -18,7 +17,6 @@ export default function Login() {
   // Triggered when the form is submitted (Button click or Enter key)
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault(); // Prevent default browser page reload
-    setError('');
     setIsLoading(true);
 
     try { // login request to backend
@@ -37,8 +35,6 @@ export default function Login() {
       
     } catch (err: any) {
       console.error(err);
-      // Display backend error message or a default fallback
-      setError(err.response?.data?.message || 'Login failed. Please check your credentials.');
     } finally {
       setIsLoading(false);
     }
@@ -53,13 +49,6 @@ export default function Login() {
           <h1 className="text-3xl font-bold text-blue-600 mb-2">Memento</h1>
           <p className="text-slate-500 font-medium">Doctor Management Panel</p>
         </div>
-
-        {/* Error Alert (Only visible if the error state is populated) */}
-        {error && (
-          <div className="bg-red-50 text-red-600 p-3 rounded-lg mb-6 text-sm font-medium text-center border border-red-100">
-            {error}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {/* Email Input Group */}

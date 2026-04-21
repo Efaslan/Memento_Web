@@ -3,11 +3,16 @@ import { AuthProvider } from './context/AuthProvider';
 import { useAuth } from './hooks/useAuth';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
+import ResetPassword from './pages/ResetPassword';
+import Register from './pages/Register';
 import { ProtectedRoute } from './components/ProtectedRoute';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function App() {
   return (
     <AuthProvider> 
+        <ToastContainer />
       <Routes>
         {/* if the user is logged in, send them to dashboard */}
         <Route path="/login" element={<LoginRoute />} />
@@ -21,6 +26,9 @@ export default function App() {
             </ProtectedRoute>
           } 
         />
+
+        <Route path="/reset-password" element={<ResetPassword />} />
+        <Route path="/register" element={<Register />} />
 
         {/* main page is dashboard */}
         <Route path="/" element={<Navigate to="/dashboard" replace />} />

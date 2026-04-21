@@ -15,6 +15,11 @@ export const authService = {
         return response.data; 
     },
 
+    requestOtpForPasswordReset: async (email : string) => {
+        const response = await api.post('auth/password-reset/request', { email });
+        return response.data;
+    },
+
     resetPassword: async (data: ResetPasswordDto): Promise<string> =>{
         const response = await api.post<string>('auth/password-reset/reset', data);
         return response.data;
