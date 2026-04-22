@@ -5,7 +5,9 @@ import { authService } from '../services/authService';
 import type { UserRole } from '../types/user';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import { IMaskInput } from 'react-imask';
+import Input from '../components/Input';
+import Button from '../components/Button';
+import PhoneInput from '../components/PhoneInput';
 
 export default function Register() {
   const [formData, setFormData] = useState({
@@ -60,116 +62,63 @@ export default function Register() {
           <p className="text-slate-500 font-medium">Hesap Oluşturun</p>
         </div>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form onSubmit={handleSubmit}>
           {/* name and surname next to each other */}
           <div className="grid grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Ad
-              </label>
-              <input 
-                type="text" 
-                name="firstName" 
-                value={formData.firstName} 
-                onChange={handleChange} 
-                required 
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                placeholder="John"
-              />
-            </div>
-            
-            <div>
-              <label className="block text-sm font-medium text-slate-700 mb-1">
-                Soyad
-              </label>
-              <input 
-                type="text" 
-                name="lastName" 
-                value={formData.lastName} 
-                onChange={handleChange} 
-                required 
-                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-                placeholder="Doe"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Email Adresi
-            </label>
-            <input 
-              type="email" 
-              name="email" 
-              value={formData.email} 
+            <Input 
+              label="Ad" 
+              name="firstName" 
+              value={formData.firstName} 
               onChange={handleChange} 
               required 
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              placeholder="john@memento.com"
+              placeholder="Ahmet" 
+            />
+            <Input 
+              label="Soyad" 
+              name="lastName" 
+              value={formData.lastName} 
+              onChange={handleChange} 
+              required 
+              placeholder="Yılmaz" 
             />
           </div>
 
-          <div>
-      <label className="block text-sm font-medium text-slate-700 mb-1">
-        Telefon Numarası
-      </label>
-      <div className="flex">
-        <div className="flex items-center gap-2 bg-slate-50 border border-slate-300 border-r-0 rounded-l-lg px-3 py-2 text-slate-600 font-medium select-none pointer-events-none">
-          <span>🇹🇷</span>
-          <span>+90</span>
-        </div>
-        
-        {/* InputMask for phone numbers */}
-        <IMaskInput
-          mask="(000) 000 00 00" // must be numbers
-          unmask={true} // unmasks (500) to "500"
-          name="phoneNumber"
-          value={formData.phoneNumber}
-          // unmaskedValue: "5008101320"
-          onAccept={(unmaskedValue) => {
-            setFormData({ ...formData, phoneNumber: unmaskedValue });
-          }}
-          required
-          className="flex-1 w-full px-4 py-2 border border-slate-300 rounded-r-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all placeholder:text-slate-400"
-          placeholder="(5__) ___ __ __"
-        />
-      </div>
-    </div>
+          <Input 
+            label="Email Adresi" 
+            type="email" 
+            name="email" 
+            value={formData.email} 
+            onChange={handleChange} 
+            required 
+            placeholder="sizin@mailiniz.com" 
+          />
 
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Şifre
-            </label>
-            <input 
-              type="password" 
-              name="password" 
-              value={formData.password} 
-              onChange={handleChange} 
-              required 
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              placeholder="••••••••"
-            />
-          </div>
+          <PhoneInput 
+            label="Telefon Numarası"
+            value={formData.phoneNumber}
+            onAccept={(val) => setFormData({ ...formData, phoneNumber: val })}
+            required
+          />
 
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+          <Input 
+            label="Şifre" 
+            type="password" 
+            name="password" 
+            value={formData.password} 
+            onChange={handleChange} 
+            required 
+            placeholder="••••••••" 
+          />
+
+          <Button 
+            type="submit" 
+            variant="primary"
+            isLoading={isLoading}
+            loadingText="Kayıt olunuyor..."
           >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Kayıt olunuyor...
-              </span>
-            ) : (
-              'Register'
-            )}
-          </button>
+            Kayıt Olun
+          </Button>
         </form>
-
         <div className="mt-8 pt-6 border-t border-slate-100 text-center">
           <p className="text-sm text-slate-600">
             Zaten hesabınız var mı?{' '}

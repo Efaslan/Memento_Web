@@ -3,6 +3,8 @@ import type { FormEvent } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { useAuth } from '../hooks/useAuth';
+import Input from '../components/Input';
+import Button from '../components/Button';
 
 export default function Login() {
   // Local states for form inputs and UI feedback
@@ -47,79 +49,59 @@ export default function Login() {
         
         <div className="text-center mb-8">
           <h1 className="text-3xl font-bold text-blue-600 mb-2">Memento</h1>
-          <p className="text-slate-500 font-medium">Doctor Management Panel</p>
+          <p className="text-slate-500 font-medium">Doktor Yönetim Paneli</p>
         </div>
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Email Input Group */}
-          <div>
-            <label className="block text-sm font-medium text-slate-700 mb-1">
-              Email Address
-            </label>
-            <input
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
-              placeholder="doctor@memento.com"
-            />
-          </div>
+          <Input
+            label="Email Adresi"
+            type="email"
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            required
+            placeholder="sizin@mailiniz.com"
+          />
 
           {/* Password Input Group */}
-          <div>
-            <div className="flex items-center justify-between mb-1">
-              <label className="block text-sm font-medium text-slate-700">
-                Password
-              </label>
-              {/* Forgot Password Link */}
-              <Link 
-                to="/reset-password" 
-                className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors"
-              >
-                Forgot Password?
-              </Link>
-            </div>
-            <input
+          <div className="relative">
+            <Link 
+              to="/reset-password" 
+              className="absolute right-0 top-0 text-sm font-medium text-blue-600 hover:text-blue-500"
+            >
+              Şifremi Unuttum
+            </Link>
+          
+            <Input
+              label="Şifre"
               type="password"
-              required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all"
+              required
               placeholder="••••••••"
+              minLength={6}
             />
           </div>
 
           {/* Submit Button */}
-          <button
-            type="submit"
-            disabled={isLoading}
-            className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2.5 rounded-lg transition-colors disabled:opacity-70 disabled:cursor-not-allowed flex justify-center items-center"
+          <Button 
+            type="submit" 
+            variant="primary" 
+            isLoading={isLoading}
+            loadingText="Giriş Yapılıyor..."
           >
-            {isLoading ? (
-              <span className="flex items-center gap-2">
-                {/* SVG Loading Spinner */}
-                <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                Signing in...
-              </span>
-            ) : (
-              'Sign In'
-            )}
-          </button>
+            Giriş Yap
+          </Button>
         </form>
 
         {/* Divider and Register Link */}
         <div className="mt-8 pt-6 border-t border-slate-100 text-center">
           <p className="text-sm text-slate-600">
-            Don't have an account?{' '}
+            Hesabınız yok mu?{' '}
             <Link 
               to="/register" 
               className="font-semibold text-blue-600 hover:text-blue-700 transition-colors"
             >
-              Sign up
+              Kayıt olun
             </Link>
           </p>
         </div>
