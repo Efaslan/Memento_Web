@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { doctorService } from '../services/doctorService';
 import type { PatientCardDto } from '../types/patient';
+import { toast } from 'react-toastify';
+import AddPatient from './AddPatient';
 
 interface PatientListProps {
   selectedPatientId: number | null;
@@ -16,7 +18,8 @@ export default function PatientList({ selectedPatientId, onSelectPatient }: Pati
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState('');
+
+  const [isAddMenuOpen, setIsAddMenuOpen] = useState(false);
 
   // 1. Arama kutusuna yazıldığında 500ms bekleyip asıl arama kelimesini (debounced) günceller
   useEffect(() => {
@@ -32,7 +35,6 @@ export default function PatientList({ selectedPatientId, onSelectPatient }: Pati
   useEffect(() => {
     const fetchPatients = async () => {
       setIsLoading(true);
-      setError('');
       try {
         const response = await doctorService.getMyPatients(debouncedSearch, page);
         
@@ -48,7 +50,7 @@ export default function PatientList({ selectedPatientId, onSelectPatient }: Pati
         
       } catch (err) {
         console.error("Hastalar çekilirken hata:", err);
-        setError('Hastalar yüklenemedi. Lütfen tekrar deneyin.');
+        toast.error('Hastalar yüklenemedi. Lütfen bağlantınızı kontrol edip tekrar deneyin.');
       } finally {
         setIsLoading(false);
       }
@@ -61,24 +63,46 @@ export default function PatientList({ selectedPatientId, onSelectPatient }: Pati
     <aside className="w-80 lg:w-96 bg-white border-r border-slate-200 flex flex-col shrink-0">
       {/* Arama Alanı */}
       <div className="p-4 border-b border-slate-100 shrink-0">
-        <div className="relative">
-          <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
-          </span>
-          <input 
-            type="text" 
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            placeholder="Hasta adı ile ara..." 
-            className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
-          />
+        <div className="flex gap-2">
+          {/* Arama Kutusu */}
+          <div className="relative flex-1">
+            <span className="absolute inset-y-0 left-0 pl-3 flex items-center text-slate-400">
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"></circle><line x1="21" y1="21" x2="16.65" y2="16.65"></line></svg>
+            </span>
+            <input 
+              type="text" 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              placeholder="Hasta adı ile ara..." 
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 transition-all"
+            />
+          </div>
+          
+          {/* Hasta Ekle Butonu */}
+          <div className="relative">
+            <button 
+              onClick={() => setIsAddMenuOpen(!isAddMenuOpen)}
+              className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2.5 rounded-xl text-sm font-medium transition-colors whitespace-nowrap shadow-sm flex items-center gap-1"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+              Hasta Ekle
+            </button>
+
+            {/* Konuşma Baloncuğu */}
+            {isAddMenuOpen && (
+              <AddPatient 
+                onClose={() => setIsAddMenuOpen(false)} 
+                onSuccess={() => {
+                  // İstersen burada listeyi yeniden fetch eden fonksiyonunu çağırabilirsin
+                }}
+              />
+            )}
+          </div>
         </div>
       </div>
 
       {/* Kaydırılabilir Kart Listesi */}
       <div className="flex-1 overflow-y-auto p-3 space-y-3 bg-slate-50/30">
-        
-        {error && <div className="text-red-500 text-sm text-center p-2">{error}</div>}
         
         {/* Hastalar Yoksa */}
         {!isLoading && patients.length === 0 && (

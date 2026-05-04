@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { toast } from 'react-toastify'; // Toast kütüphanesini ekledik
+import { toast } from 'react-toastify';
 
 // translates backend error codes
 const errorDictionary: Record<string, string> = {
@@ -12,7 +12,7 @@ const errorDictionary: Record<string, string> = {
 
 // axios instance
 const api = axios.create({
-  baseURL: 'http://localhost:8080/api/v1', // Spring Boot api url
+  baseURL: 'https://emir-memento.me/api/v1', // Spring Boot api url
   headers: {
     'Content-Type': 'application/json',
   },

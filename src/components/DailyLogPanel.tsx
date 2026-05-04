@@ -1,7 +1,7 @@
 import { useState, useEffect, useMemo } from 'react';
 import { toast } from 'react-toastify';
 import { doctorService } from '../services/doctorService';
-import type { DailyLogDto } from '../types/log';
+import type { DailyLogDto } from '../types/dailyLog';
 
 interface DailyLogPanelProps {
   patientId: number;
@@ -18,7 +18,7 @@ export default function DailyLogPanel({ patientId }: DailyLogPanelProps) {
       try {
         const data = await doctorService.getPatientRecentLogs(patientId, days);
         setLogs(data);
-      } catch (error: any) {
+      } catch (error) {
         console.error("Loglar çekilirken hata:", error);
         // Toast ile zarif hata gösterimi
         toast.error('Günlük kayıtları çekilirken bir sorun oluştu.');

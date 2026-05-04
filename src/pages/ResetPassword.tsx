@@ -20,7 +20,7 @@ export default function ResetPassword() {
 
   // timer -= 1 if timer > 0
   useEffect(() => {
-    let interval: any;
+    let interval: number;
     if (timer > 0) {
       interval = setInterval(() => {
         setTimer((prev) => prev - 1);

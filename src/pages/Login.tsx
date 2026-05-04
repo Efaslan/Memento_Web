@@ -35,7 +35,7 @@ export default function Login() {
       // Redirect to the dashboard upon successful login
       navigate('/dashboard');
       
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
     } finally {
       setIsLoading(false);
