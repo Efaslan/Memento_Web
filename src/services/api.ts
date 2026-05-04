@@ -60,6 +60,9 @@ api.interceptors.response.use(
       const userFriendlyMessage = errorDictionary[backendMessage] || backendMessage;
       toast.error(userFriendlyMessage);
     }
+    else if (status === 429) {
+      toast.error("Çok fazla deneme yaptınız. Lütfen daha sonra tekrar deneyin.");
+    }
     else if (status === 500) {
       toast.error("Sunucu tarafında bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
     }

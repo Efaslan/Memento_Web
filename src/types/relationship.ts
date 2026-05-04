@@ -2,7 +2,6 @@ export interface RelationshipRequestDto {
   targetEmail: string;
   relationshipType: 'DOCTOR';
   isPrimaryContact: boolean;
-  otpCode: string;
 }
 
 export interface RelationshipResponseDto {

@@ -45,7 +45,7 @@ export default function Register() {
       // navigating to login on success
       navigate('/login');
       
-    } catch (err: any) {
+    } catch (err) {
       console.error(err);
       toast.error("Kayıt başarısız. ")
     } finally {

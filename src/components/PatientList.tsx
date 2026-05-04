@@ -13,6 +13,7 @@ export default function PatientList({ selectedPatientId, onSelectPatient }: Pati
   const [patients, setPatients] = useState<PatientCardDto[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [debouncedSearch, setDebouncedSearch] = useState('');
+  const [refreshTrigger, setRefreshTrigger] = useState(0);
   
   // Pagination (Sayfalama) stateleri
   const [page, setPage] = useState(0);
@@ -57,7 +58,7 @@ export default function PatientList({ selectedPatientId, onSelectPatient }: Pati
     };
 
     fetchPatients();
-  }, [debouncedSearch, page]);
+  }, [debouncedSearch, page, refreshTrigger]);
 
   return (
     <aside className="w-80 lg:w-96 bg-white border-r border-slate-200 flex flex-col shrink-0">
@@ -93,7 +94,13 @@ export default function PatientList({ selectedPatientId, onSelectPatient }: Pati
               <AddPatient 
                 onClose={() => setIsAddMenuOpen(false)} 
                 onSuccess={() => {
-                  // İstersen burada listeyi yeniden fetch eden fonksiyonunu çağırabilirsin
+                  // Eğer başka bir sayfadaysak (örn: 3. sayfa), başa dön ki yeni hasta görünsün
+                  if (page !== 0) {
+                    setPage(0); 
+                  } else {
+                    // Zaten 0. sayfadaysak, sadece trigger'ı artırarak useEffect'i yeniden çalıştır
+                    setRefreshTrigger(prev => prev + 1);
+                  }
                 }}
               />
             )}

@@ -3,20 +3,11 @@ import type { RelationshipRequestDto, RelationshipResponseDto } from '../types/r
 
 export const relationshipService = {
 
-  requestPatientOtp: async (email: string): Promise<string> => {
-    const response = await api.post<string>('/relationships/request', { 
-      targetEmail: email 
-    });
-    
-    return response.data;
-  },
-
-  addPatient: async (data: { email: string; otpCode: string }): Promise<RelationshipResponseDto> => {
+  addPatient: async (data: { email: string }): Promise<RelationshipResponseDto> => {
     const payload: RelationshipRequestDto = {
       targetEmail: data.email,
       relationshipType: 'DOCTOR',
-      isPrimaryContact: true,
-      otpCode: data.otpCode
+      isPrimaryContact: true
     };
 
     const response = await api.post<RelationshipResponseDto>('/relationships', payload);
