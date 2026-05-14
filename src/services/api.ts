@@ -40,45 +40,112 @@ api.interceptors.request.use(
   }
 );
 
+interface FailedRequest {
+  resolve: (value: string | null) => void;
+  reject: (reason?: unknown) => void;
+}
+
+// --- variables for refresh token logic ---
+let isRefreshing = false;
+// we're making a queue of failed requests while we're refreshing the token, so that we can retry them once we get a new token
+let failedQueue: FailedRequest[] = [];
+
+const processQueue = (error: unknown, token: string | null = null) => {
+  failedQueue.forEach(prom => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 // intercepts responses from the backend to frontend. E.g. automatically send user to login page on 401 error
 api.interceptors.response.use(
   (response) => response,
-  (error) => {
+  async (error) => {
 
     if (!error.response) {
       toast.error("Sunucuya ulaşılamıyor. Lütfen bağlantınızı kontrol edin.");
       return Promise.reject(error);
     }
 
+    const originalRequest = error.config;
     const status = error.response.status;
     const backendMessage = error.response.data?.message;
 
     if (typeof backendMessage === 'string' && backendResponseDictionary[backendMessage]) {
-      // Sözlükte bu başarı/bilgi mesajı varsa direkt göster
+      // look up from the dictionary and show user-friendly message if exists
       toast.success(backendResponseDictionary[backendMessage]);
     }
 
     // Unauthorized
-    if (status === 401) {
-      toast.error("Oturumunuz sonlanmış. Lütfen giriş yapın.");
+    // If 401, and the message says token has expired and this request hasn't been retried before, then try to refresh the token
+      if (status === 401 && typeof backendMessage === 'string' && backendMessage.includes("Token has expired") && !originalRequest._retry) {
+        
+        // If already attempting a refresh, add the new requests to the queue
+        if (isRefreshing) {
+          return new Promise(function(resolve, reject) {
+            failedQueue.push({ resolve, reject });
+          }).then(token => {
+            originalRequest.headers['Authorization'] = 'Bearer ' + token;
+            return api(originalRequest); // retry with new token
+          }).catch(err => {
+            return Promise.reject(err);
+          });
+        }
 
-      localStorage.removeItem('memento_jwt_token');
-      localStorage.removeItem('memento_refresh_token');
-      localStorage.removeItem('memento_device_id');
-      localStorage.removeItem('user');
-      
-      window.location.href = '/login'; 
-    }
-    else if (status === 400 || status === 403 || status === 404 || status === 409) {
-      const userFriendlyMessage = backendResponseDictionary[backendMessage] || backendMessage;
-      toast.error(userFriendlyMessage);
-    }
-    else if (status === 429) {
-      toast.error("Çok fazla deneme yaptınız. Lütfen daha sonra tekrar deneyin.");
-    }
-    else if (status === 500) {
-      toast.error("Sunucu tarafında bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
-    }
+        // if a refresh is not already in progress, start one
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        try {
+          const refreshToken = localStorage.getItem('memento_refresh_token');
+          if (!refreshToken) throw new Error("Refresh token bulunamadı.");
+
+          const { data } = await axios.post('https://emir-memento.me/api/v1/auth/refresh', { refreshToken });
+          
+          const newJwt = data.accessJwtToken;
+
+          // save new jwt to local storage
+          localStorage.setItem('memento_jwt_token', newJwt);
+
+          // distribute the new token to all pending requests in the queue
+          processQueue(null, newJwt);
+
+          // retry the original request with the new token
+          originalRequest.headers['Authorization'] = 'Bearer ' + newJwt;
+          return api(originalRequest);
+
+        } catch (refreshError) {
+          // if refresh also fails (e.g. refresh token is expired), then we need to log the user out and send them to login page
+          processQueue(refreshError, null);
+          
+          // clear local storage and redirect to login
+          localStorage.removeItem('memento_jwt_token');
+          localStorage.removeItem('memento_refresh_token');
+          localStorage.removeItem('memento_device_id');
+          localStorage.removeItem('user');
+          
+          toast.error("Oturum süreniz tamamen doldu. Lütfen tekrar giriş yapın.");
+          window.location.href = '/login';
+          
+          return Promise.reject(refreshError);
+        } finally {
+          isRefreshing = false;
+        }
+      }
+      else if (status === 400 || status === 403 || status === 404 || status === 409) {
+        const userFriendlyMessage = backendResponseDictionary[backendMessage] || backendMessage;
+        toast.error(userFriendlyMessage);
+      }
+      else if (status === 429) {
+        toast.error("Çok fazla deneme yaptınız. Lütfen daha sonra tekrar deneyin.");
+      }
+      else if (status === 500) {
+        toast.error("Sunucu tarafında bir hata oluştu. Lütfen daha sonra tekrar deneyin.");
+      }
 
     return Promise.reject(error);
   }

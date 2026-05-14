@@ -28,5 +28,10 @@ export const authService = {
     logout: async (data: LogoutRequestDto): Promise<void> => {
         const response = await api.post('devices/logout', data);
         return response.data;
+    },
+
+    refreshJwtToken: async (refreshToken: string): Promise<{ accessJwtToken: string }> => {
+        const response = await api.post<{ accessJwtToken: string }>('/auth/refresh', { refreshToken });
+        return response.data;
     }
 };
