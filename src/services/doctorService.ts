@@ -31,5 +31,14 @@ export const doctorService = {
   addGeneralReminderToPatient: async (reminderData: GeneralReminderRequestDto): Promise<GeneralReminderDto> => {
     const response = await api.post<GeneralReminderDto>('/reminders', reminderData);
     return response.data;
+  },
+
+  updateGeneralReminder: async (reminderId: number, reminderData: GeneralReminderRequestDto): Promise<GeneralReminderDto> => {
+    const response = await api.put<GeneralReminderDto>(`/reminders/${reminderId}`, reminderData);
+    return response.data;
+  },
+
+  deleteGeneralReminder: async (reminderId: number): Promise<void> => {
+    await api.delete(`/reminders/${reminderId}`);
   }
 };

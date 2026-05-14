@@ -10,7 +10,7 @@ const backendResponseDictionary: Record<string, string> = {
   "USER_NOT_FOUND": "Bu e-posta adresiyle kayıtlı bir hesap bulunamadı.",
   "PASSWORD_MUST_BE_MIN_8_MAX_30_CHARACTERS": "Şifreniz çok kısa, lütfen en az 8 karakter kullanın.",
   "Your password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.": "Şifreniz büyük harf, küçük harf, rakam ve özel karakter içermelidir.",
-
+  "YOU_CAN_ONLY_MODIFY_YOUR_OWN_OR_CREATED_REMINDERS": "Sadece kendi oluşturduğunuz hatırlatmaları düzenleyebilirsiniz.",
 
 
 };
@@ -74,11 +74,6 @@ api.interceptors.response.use(
     const originalRequest = error.config;
     const status = error.response.status;
     const backendMessage = error.response.data?.message || error.response.data;
-
-    if (typeof backendMessage === 'string' && backendResponseDictionary[backendMessage]) {
-      // look up from the dictionary and show user-friendly message if exists
-      toast.success(backendResponseDictionary[backendMessage]);
-    }
 
     // Unauthorized
     // If 401, and the message says token has expired and this request hasn't been retried before, then try to refresh the token
