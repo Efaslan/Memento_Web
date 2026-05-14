@@ -2,7 +2,7 @@ import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
-import type { UserRole } from '../types/user';
+import type { UserRole, Gender } from '../types/user';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
 import Input from '../components/Input';
@@ -16,6 +16,7 @@ export default function Register() {
     email: '',
     password: '',
     phoneNumber: '',
+    gender: '' as Gender,
     role: 'DOCTOR' as UserRole
   });
   
@@ -41,13 +42,12 @@ export default function Register() {
     try {
       await authService.register(formData);
       
-      toast.success("Kayıt başarılı. Lütfen giriş yapın.");
       // navigating to login on success
       navigate('/login');
       
     } catch (err) {
       console.error(err);
-      toast.error("Kayıt başarısız. ")
+      toast.error("Kayıt başarısız. Lütfen bilgilerinizi kontrol edin ve tekrar deneyin.");
     } finally {
       setIsLoading(false);
     }
@@ -93,12 +93,42 @@ export default function Register() {
             placeholder="sizin@mailiniz.com" 
           />
 
-          <PhoneInput 
-            label="Telefon Numarası"
-            value={formData.phoneNumber}
-            onAccept={(val) => setFormData({ ...formData, phoneNumber: val })}
-            required
-          />
+          {/* Telefon ve Cinsiyet Alanı - Yan Yana */}
+        <div className="flex flex-col sm:flex-row gap-4">
+          
+          {/* Telefon Numarası - flex-1 ile alanın yarısını kaplar */}
+          <div className="flex-2">
+            <PhoneInput 
+              label="Telefon Numarası"
+              value={formData.phoneNumber}
+              onAccept={(val) => setFormData({ ...formData, phoneNumber: val })}
+              required
+            />
+          </div>
+
+          {/* Cinsiyet Dropdown - flex-1 ile alanın diğer yarısını kaplar */}
+          <div className="flex-1">
+            <div className="mb-4">
+              <label className="block text-sm font-medium text-slate-700 mb-1">
+                Cinsiyet
+              </label>
+              <select
+                value={formData.gender || ""}
+                onChange={(e) => setFormData({ ...formData, gender: e.target.value as Gender })}
+                required
+                className="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white text-slate-700 h-[42px]"
+              >
+                <option value="">Seçiniz</option>
+                {/* Backend'deki Enum değerlerine göre value'ları güncelle (örn: MALE, FEMALE) */}
+                <option value="MALE">Erkek</option>
+                <option value="FEMALE">Kadın</option>
+                <option value="OTHER">Diğer</option>
+                <option value="PREFER_NOT_TO_SAY">Belirtmek İstemiyorum</option>
+              </select>
+            </div>
+          </div>
+
+        </div>
 
           <Input 
             label="Şifre" 

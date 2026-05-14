@@ -1,5 +1,5 @@
 import api from './api';
-import type { LoginRequestDto, LoginResponseDto, RegisterRequestDto, ResetPasswordDto } from '../types/auth';
+import type { LoginRequestDto, LoginResponseDto, LogoutRequestDto, RegisterRequestDto, ResetPasswordDto } from '../types/auth';
 import type { UserDto } from '../types/user';
 
 export const authService = {
@@ -23,6 +23,10 @@ export const authService = {
     resetPassword: async (data: ResetPasswordDto): Promise<string> =>{
         const response = await api.post<string>('auth/password-reset/reset', data);
         return response.data;
-    }
+    },
 
+    logout: async (data: LogoutRequestDto): Promise<void> => {
+        const response = await api.post('devices/logout', data);
+        return response.data;
+    }
 };

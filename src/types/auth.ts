@@ -1,13 +1,18 @@
-import type { UserDto, UserRole } from './user';
+import type { Gender, UserDto, UserRole } from './user';
 
 export interface LoginRequestDto {
   email: string;
   password: string;
+  deviceId?: number; 
+  deviceModel: string;
+  osVersion: string;
 }
 
 export interface LoginResponseDto {
-  token: string;
   user: UserDto;
+  accessJwtToken: string;
+  refreshToken: string;
+  deviceId: number;
 }
 
 export interface RegisterRequestDto{
@@ -16,6 +21,7 @@ export interface RegisterRequestDto{
     email: string;
     password: string;
     phoneNumber: string;
+    gender: Gender;
     role: UserRole;
 }
 
@@ -25,9 +31,15 @@ export interface ResetPasswordDto{
     newPassword: string;
 }
 
+export interface LogoutRequestDto {
+    deviceId: number;
+}
+
 export interface AuthContextType {
   user: UserDto | null;
   token: string | null;
+  refreshToken: string | null;
+  deviceId: number | null;
   isAuthenticated: boolean;
   login: (data: LoginResponseDto) => void;
   logout: () => void;

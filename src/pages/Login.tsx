@@ -5,6 +5,7 @@ import { authService } from '../services/authService';
 import { useAuth } from '../hooks/useAuth';
 import Input from '../components/Input';
 import Button from '../components/Button';
+import { getBrowserDeviceInfo } from '../utils/device';
 
 export default function Login() {
   // Local states for form inputs and UI feedback
@@ -24,7 +25,10 @@ export default function Login() {
     try { // login request to backend
       const response = await authService.login({
         email: email,
-        password: password 
+        password: password,
+        deviceId: localStorage.getItem('memento_device_id') ? Number(localStorage.getItem('memento_device_id')) : undefined, // Cihaz ID'si varsa ekle
+        deviceModel: getBrowserDeviceInfo().deviceModel,
+        osVersion: getBrowserDeviceInfo().osVersion
       });
 
       console.log('Response from backend:', response);
