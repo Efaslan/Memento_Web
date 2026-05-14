@@ -43,5 +43,6 @@ export interface AuthContextType {
   isAuthenticated: boolean;
   login: (data: LoginResponseDto) => void;
   logout: () => void;
+  updateUser: (updatedData: Partial<UserDto>) => void;
   isLoading: boolean;
 }

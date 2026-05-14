@@ -8,51 +8,53 @@ import Button from './Button';
 import PhoneInput from './PhoneInput';
 
 export default function DoctorProfile() {
-  const { user } = useAuth();
+  const { user, updateUser } = useAuth();
   
   const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
   
+  // İlk state'i user objesi ile başlatıyoruz
   const [formData, setFormData] = useState<DoctorProfileRequestDto>({
-    firstName: '',
-    lastName: '',
-    email: '',
-    phoneNumber: '',
+    firstName: user?.firstName || '',
+    lastName: user?.lastName || '',
+    email: user?.email || '',
+    phoneNumber: user?.phoneNumber || '',
     specialization: '',
     hospitalName: '',
     title: ''
   });
 
   useEffect(() => {
-    // 1. Önce fonksiyonu useEffect'in İÇİNDE tanımlıyoruz
     const fetchProfile = async () => {
       setIsLoading(true);
       try {
         const data = await profileService.getMyProfile();
+        
+        // Form verisini hem user'dan hem de varsa profilden gelen verilerle harmanlıyoruz
         setFormData({
-          firstName: data.firstName || '',
-          lastName: data.lastName || '',
-          email: data.email || '',
-          phoneNumber: data.phoneNumber || '',
-          specialization: data.specialization || '',
-          hospitalName: data.hospitalName || '',
-          title: data.title || ''
+          // Temel bilgiler her zaman Auth Context'ten (user objesinden) gelir
+          firstName: user?.firstName || '',
+          lastName: user?.lastName || '',
+          email: user?.email || '',
+          phoneNumber: user?.phoneNumber || '',
+          
+          // Profil bilgileri endpoint'ten gelir, null ise boş string olur
+          specialization: data?.specialization || '',
+          hospitalName: data?.hospitalName || '',
+          title: data?.title || ''
         });
       } catch (err) {
         console.error("Profil çekilemedi:", err);
-        toast.error("Profil bilgileri alınamadı.");
-        setIsProfileOpen(false); // Hata varsa kapat
       } finally {
         setIsLoading(false);
       }
     };
 
-    // 2. Fonksiyon tanımlandıktan sonra, şartımızı kontrol edip çağırıyoruz
     if (isProfileOpen) {
       fetchProfile();
     }
-  }, [isProfileOpen]);
+  }, [isProfileOpen, user]); // user değişirse de useEffect haberdar olsun
 
   const handleInputChange = (field: keyof DoctorProfileRequestDto, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
@@ -63,11 +65,17 @@ export default function DoctorProfile() {
     setIsSaving(true);
     try {
       await profileService.updateDoctorProfile(formData);
+
+      updateUser({
+            firstName: formData.firstName,
+            lastName: formData.lastName,
+            email: formData.email,
+            phoneNumber: formData.phoneNumber
+          });
+
       toast.success("Profil başarıyla güncellendi!");
-      setIsProfileOpen(false);
     } catch (err) {
       console.error("Profil güncellenirken hata:", err);
-      toast.error("Profil güncellenemedi. Lütfen bilgileri kontrol edin.");
     } finally {
       setIsSaving(false);
     }
@@ -105,64 +113,73 @@ export default function DoctorProfile() {
                 Bilgiler yükleniyor...
               </div>
             ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+              <form onSubmit={handleSubmit} className="flex flex-col">
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    label="Ad"
-                    value={formData.firstName}
-                    onChange={(e) => handleInputChange('firstName', e.target.value)}
-                    required
-                  />
-                  <Input
-                    label="Soyad"
-                    value={formData.lastName}
-                    onChange={(e) => handleInputChange('lastName', e.target.value)}
-                    required
-                  />
-                </div>
-
-                <div className="grid grid-cols-2 gap-4">
-                  <Input
-                    label="Unvan"
-                    value={formData.title}
-                    onChange={(e) => handleInputChange('title', e.target.value)}
-                    placeholder="Örn: Prof. Dr."
-                    required
-                  />
-                  <Input
-                    label="Uzmanlık"
-                    value={formData.specialization}
-                    onChange={(e) => handleInputChange('specialization', e.target.value)}
-                    placeholder="Örn: Kardiyoloji"
-                    required
-                  />
-                </div>
-
-                  <Input
-                    label="E-posta"
-                    type="email"
-                    value={formData.email}
-                    onChange={(e) => handleInputChange('email', e.target.value)}
-                    required
-                  />
+                {/* --- KİŞİSEL BİLGİLER BÖLÜMÜ --- */}
+                <div className="mb-4">
+                  <h4 className="text-sm font-bold text-slate-400 tracking-wider mb-3">Kişisel Bilgiler</h4>
                   
-                  {/* Yeni PhoneInput Entegrasyonu */}
-                  <PhoneInput
-                    label="Telefon"
-                    value={formData.phoneNumber}
-                    onAccept={(val) => handleInputChange('phoneNumber', val)}
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      label="Ad"
+                      value={formData.firstName}
+                      onChange={(e) => handleInputChange('firstName', e.target.value)}
+                      required
+                    />
+                    <Input
+                      label="Soyad"
+                      value={formData.lastName}
+                      onChange={(e) => handleInputChange('lastName', e.target.value)}
+                      required
+                    />
+                  </div>
+
+                    <Input
+                      label="E-posta"
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => handleInputChange('email', e.target.value)}
+                      required
+                    />
+                    <PhoneInput
+                      label="Telefon"
+                      value={formData.phoneNumber}
+                      onAccept={(val) => handleInputChange('phoneNumber', val)}
+                      required
+                    />
+                </div>
+
+                <hr className="border-slate-100 mb-4" />
+
+                {/* --- MESLEKİ BİLGİLER BÖLÜMÜ --- */}
+                <div className="mb-2">
+                  <h4 className="text-sm font-bold text-slate-400 tracking-wider mb-3">Mesleki Bilgiler</h4>
+                  
+                  <div className="grid grid-cols-2 gap-4">
+                    <Input
+                      label="Unvan"
+                      value={formData.title}
+                      onChange={(e) => handleInputChange('title', e.target.value)}
+                      placeholder="Örn: Prof. Dr."
+                      required
+                    />
+                    <Input
+                      label="Uzmanlık"
+                      value={formData.specialization}
+                      onChange={(e) => handleInputChange('specialization', e.target.value)}
+                      placeholder="Örn: Kardiyoloji"
+                      required
+                    />
+                  </div>
+
+                  <Input
+                    label="Hastane Adı"
+                    value={formData.hospitalName}
+                    onChange={(e) => handleInputChange('hospitalName', e.target.value)}
                     required
                   />
+                </div>
 
-                <Input
-                  label="Hastane Adı"
-                  value={formData.hospitalName}
-                  onChange={(e) => handleInputChange('hospitalName', e.target.value)}
-                  required
-                />
-
-                <div className="mt-2 flex justify-end">
                   <Button 
                     type="submit" 
                     variant="primary" 
@@ -172,7 +189,6 @@ export default function DoctorProfile() {
                   >
                     Profili Güncelle
                   </Button>
-                </div>
               </form>
             )}
           </div>

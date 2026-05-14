@@ -63,6 +63,14 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
     localStorage.removeItem('user');
   };
 
+  const updateUser = (updatedData: Partial<UserDto>) => {
+    if (user) {
+      const newUser = { ...user, ...updatedData };
+      setUser(newUser);
+      localStorage.setItem('user', JSON.stringify(newUser));
+    }
+  };
+
   const isAuthenticated = !!token;
 
   return (
@@ -74,6 +82,7 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
       isAuthenticated, 
       login, 
       logout, 
+      updateUser,
       isLoading: false 
     }}>
       {children}
