@@ -1,5 +1,5 @@
 import api from './api';
-import type { GeneralReminderDto, GeneralReminderRequestDto, PatientCardDto, SliceResponse } from '../types/patient';
+import type { GeneralReminderDto, GeneralReminderRequestDto, MedicationScheduleRequestDto, MedicationScheduleResponseDto, PatientCardDto, SliceResponse } from '../types/patient';
 import type { DailyLogDto } from '../types/patient'
 
 export const doctorService = {
@@ -40,5 +40,29 @@ export const doctorService = {
 
   deleteGeneralReminder: async (reminderId: number): Promise<void> => {
     await api.delete(`/reminders/${reminderId}`);
+  },
+
+  getPatientActiveMedicationSchedules: async (patientId: number): Promise<MedicationScheduleResponseDto[]> => {
+    const response = await api.get<MedicationScheduleResponseDto[]>(`/medications/schedules/patient/${patientId}`);
+    return response.data;
+  },
+
+  getPatientMedicationSchedulesHistory: async (patientId: number): Promise<MedicationScheduleResponseDto[]> => {
+    const response = await api.get<MedicationScheduleResponseDto[]>(`/medications/schedules/${patientId}/history`);
+    return response.data;
+  },
+
+  addMedicationScheduleToPatient: async (scheduleData: MedicationScheduleRequestDto): Promise<MedicationScheduleResponseDto> => {
+    const response = await api.post<MedicationScheduleResponseDto>('/medications/schedules', scheduleData);
+    return response.data;
+  },
+
+  updateMedicationSchedule: async (scheduleId: number, scheduleData: MedicationScheduleRequestDto): Promise<MedicationScheduleResponseDto> => {
+    const response = await api.put<MedicationScheduleResponseDto>(`/medications/schedules/${scheduleId}`, scheduleData);
+    return response.data;
+  },
+
+  deactivateMedicationSchedule: async (scheduleId: number): Promise<void> => {
+    await api.delete(`/medications/schedules/${scheduleId}`);
   }
 };

@@ -32,7 +32,6 @@ export interface DailyLogDto {
 export interface GeneralReminderDto {
   reminderId: number;
   patientUserId: number;
-  creatorUserId: number;
   creatorName: string;
   title: string;
   description: string | null;
@@ -47,4 +46,34 @@ export interface GeneralReminderRequestDto {
   reminderTime: string;
   isRecurring: boolean;
   recurrenceRule?: RecurrenceRule;
+}
+
+export interface TimeInfoDto {
+  timeId: number;
+  time: string; // LocalTime JavaScript'e String ('HH:mm') olarak gelir
+}
+
+export interface MedicationScheduleResponseDto {
+  scheduleId: number;
+  patientUserId: number;
+  doctorName: string;
+  medicationName: string;
+  dosage: string;
+  notes: string | null;
+  startDate: string;
+  endDate: string;
+  isPrn: boolean;
+  isActive: boolean;
+  times: TimeInfoDto[]; // LocalTime JavaScript'e String ('HH:mm') olarak gelir
+}
+
+export interface MedicationScheduleRequestDto {
+  patientUserId: number;
+  medicationName: string;
+  dosage: string;
+  notes?: string;
+  startDate: string; // LocalDate JavaScript'e String ('YYYY-MM-DD') olarak gelir
+  endDate: string;   // LocalDate JavaScript'e String ('YYYY-MM-DD') olarak gelir
+  isPrn: boolean;
+  times: string[];   // LocalTime JavaScript'e String ('HH:mm') olarak gelir
 }

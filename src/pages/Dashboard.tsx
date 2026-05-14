@@ -4,6 +4,7 @@ import PatientList from '../components/PatientList';
 import type { PatientCardDto } from '../types/patient';
 import DailyLogPanel from '../components/DailyLogPanel';
 import GeneralReminderPanel from '../components/GeneralReminderPanel';
+import MedicationSchedulesPanel from '../components/MedicationSchedulesPanel';
 
 export default function Dashboard() {
   // SAĞ PANEL İÇİN HAFIZA: Şu an hangi hasta seçili?
@@ -63,11 +64,14 @@ export default function Dashboard() {
 
                   {/* Hatırlatma Paneli (Bunu da aynı mantıkla ayıracağız) */}
                   <GeneralReminderPanel patientId={selectedPatient.patientId} />
+
+                </div>
+                <div className="col-span-12 lg:col-span-8">
+                  <MedicationSchedulesPanel patientId={selectedPatient.patientId} />
                 </div>
               </div>
             </>
           )}
-
         </section>
       </main>
     </div>
