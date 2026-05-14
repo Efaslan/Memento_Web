@@ -1,8 +1,9 @@
 import { useState } from 'react';
-import Header from '../components/Header';
+import Header from '../components/ui/Header';
 import PatientList from '../components/PatientList';
 import type { PatientCardDto } from '../types/patient';
 import DailyLogPanel from '../components/DailyLogPanel';
+import GeneralReminderPanel from '../components/GeneralReminderPanel';
 
 export default function Dashboard() {
   // SAĞ PANEL İÇİN HAFIZA: Şu an hangi hasta seçili?
@@ -61,12 +62,7 @@ export default function Dashboard() {
                   <DailyLogPanel patientId={selectedPatient.patientId} />
 
                   {/* Hatırlatma Paneli (Bunu da aynı mantıkla ayıracağız) */}
-                  <div className="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 h-[300px]">
-                    <h3 className="font-bold text-slate-700 mb-4">Genel Hatırlatmalar</h3>
-                    <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
-                      {/* ... */}
-                    </div>
-                  </div>
+                  <GeneralReminderPanel patientId={selectedPatient.patientId} />
                 </div>
               </div>
             </>

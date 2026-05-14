@@ -1,5 +1,5 @@
-import { useAuth } from '../hooks/useAuth';
-import DoctorProfile from './DoctorProfile';
+import { useAuth } from '../../hooks/useAuth';
+import DoctorProfile from '../DoctorProfile';
 
 export default function Header() {
   const { logout } = useAuth(); // Sadece çıkış işlemi için user'a ihtiyacımız yok

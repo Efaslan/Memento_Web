@@ -1,4 +1,5 @@
 export type BloodType = 'A_POSITIVE' | 'A_NEGATIVE' | 'B_POSITIVE' | 'B_NEGATIVE' | 'AB_POSITIVE' | 'AB_NEGATIVE' | 'O_POSITIVE' | 'O_NEGATIVE';
+export type RecurrenceRule = 'DAILY' | 'WEEKLY' | 'MONTHLY' | 'YEARLY';
 
 export interface PatientCardDto {
   relationshipId: number;
@@ -18,4 +19,32 @@ export interface SliceResponse<T> {
   number: number;
   size: number;
   last: boolean;
+}
+
+export interface DailyLogDto {
+  dailyLogId: number;
+  patientUserId: number;
+  description: string;
+  quantityMl: number;
+  createdAt: string;
+}
+
+export interface GeneralReminderDto {
+  reminderId: number;
+  patientUserId: number;
+  creatorUserId: number;
+  creatorName: string;
+  title: string;
+  description: string | null;
+  reminderTime: string;
+  isRecurring: boolean;
+  recurrenceRule: RecurrenceRule;
+}
+
+export interface GeneralReminderRequestDto {
+  patientUserId: number;
+  title: string;
+  reminderTime: string;
+  isRecurring: boolean;
+  recurrenceRule?: RecurrenceRule;
 }

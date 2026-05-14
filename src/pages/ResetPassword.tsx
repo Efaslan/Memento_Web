@@ -4,8 +4,8 @@ import { useNavigate } from 'react-router-dom';
 import { authService } from '../services/authService';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import Input from '../components/Input';
-import Button from '../components/Button';
+import Input from '../components/ui/Input';
+import Button from '../components/ui/Button';
 
 export default function ResetPassword() {
   const [email, setEmail] = useState('');

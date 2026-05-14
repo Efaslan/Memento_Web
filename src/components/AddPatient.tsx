@@ -1,8 +1,8 @@
 import { useState } from 'react';
 import type { FormEvent } from 'react';
 import { toast } from 'react-toastify';
-import Input from '../components/Input';
-import Button from '../components/Button';
+import Input from './ui/Input';
+import Button from './ui/Button';
 import { relationshipService } from '../services/relationshipService';
 
 interface AddPatientProps {

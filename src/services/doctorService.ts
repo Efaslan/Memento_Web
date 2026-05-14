@@ -1,6 +1,6 @@
 import api from './api';
-import type { PatientCardDto, SliceResponse } from '../types/patient';
-import type { DailyLogDto } from '../types/dailyLog'
+import type { GeneralReminderDto, GeneralReminderRequestDto, PatientCardDto, SliceResponse } from '../types/patient';
+import type { DailyLogDto } from '../types/patient'
 
 export const doctorService = {
   
@@ -21,8 +21,15 @@ export const doctorService = {
   getPatientRecentLogs: async (patientId: number, days: number): Promise<DailyLogDto[]> => {
     const response = await api.get<DailyLogDto[]>(`/dailylogs/${patientId}/recent/${days}`);
     return response.data;
+  },
+
+  getPatientGeneralReminders: async (patientId: number): Promise<GeneralReminderDto[]> => {
+    const response = await api.get<GeneralReminderDto[]>(`/reminders/active/patient/${patientId}`);
+    return response.data;
+  },
+
+  addGeneralReminderToPatient: async (reminderData: GeneralReminderRequestDto): Promise<GeneralReminderDto> => {
+    const response = await api.post<GeneralReminderDto>('/reminders', reminderData);
+    return response.data;
   }
-
-  
-
 };

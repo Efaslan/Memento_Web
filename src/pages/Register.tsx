@@ -5,9 +5,9 @@ import { authService } from '../services/authService';
 import type { UserRole, Gender } from '../types/user';
 import { toast } from 'react-toastify';
 import { Link } from 'react-router-dom';
-import Input from '../components/Input';
-import Button from '../components/Button';
-import PhoneInput from '../components/PhoneInput';
+import Input from '../components/ui/Input';
+import Button from '../components/ui/Button';
+import PhoneInput from '../components/ui/PhoneInput';
 
 export default function Register() {
   const [formData, setFormData] = useState({

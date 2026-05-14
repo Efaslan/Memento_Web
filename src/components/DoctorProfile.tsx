@@ -3,9 +3,9 @@ import { useAuth } from '../hooks/useAuth';
 import { toast } from 'react-toastify';
 import { profileService } from '../services/profileService';
 import type { DoctorProfileRequestDto } from '../types/doctorProfile';
-import Input from './Input';
-import Button from './Button';
-import PhoneInput from './PhoneInput';
+import Input from './ui/Input';
+import Button from './ui/Button';
+import PhoneInput from './ui/PhoneInput';
 
 export default function DoctorProfile() {
   const { user, updateUser } = useAuth();

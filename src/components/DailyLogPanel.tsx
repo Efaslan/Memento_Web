@@ -1,7 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
-import { toast } from 'react-toastify';
 import { doctorService } from '../services/doctorService';
-import type { DailyLogDto } from '../types/dailyLog';
+import type { DailyLogDto } from '../types/patient';
 
 interface DailyLogPanelProps {
   patientId: number;
@@ -10,7 +9,7 @@ interface DailyLogPanelProps {
 export default function DailyLogPanel({ patientId }: DailyLogPanelProps) {
   const [logs, setLogs] = useState<DailyLogDto[]>([]);
   const [isLoading, setIsLoading] = useState(false);
-  const [days, setDays] = useState<number>(7); // Varsayılan 7 gün, içeride yönetiliyor
+  const [days, setDays] = useState<number>(7);
 
   useEffect(() => {
     const fetchLogs = async () => {
@@ -20,39 +19,38 @@ export default function DailyLogPanel({ patientId }: DailyLogPanelProps) {
         setLogs(data);
       } catch (error) {
         console.error("Loglar çekilirken hata:", error);
-        // Toast ile zarif hata gösterimi
-        toast.error('Günlük kayıtları çekilirken bir sorun oluştu.');
+        // Hata mesajı interceptor'dan geleceği için buradaki toast'ı silebilirsin veya tutabilirsin
       } finally {
         setIsLoading(false);
       }
     };
     fetchLogs();
-  }, [patientId, days]); // days değiştiğinde istek tekrar atılacak
+  }, [patientId, days]);
 
+  // Sadece tarihe göre gruplama yapıyoruz
   const groupedLogs = useMemo(() => {
-    const groups: Record<string, { FOOD: DailyLogDto[], WATER: DailyLogDto[] }> = {};
+    const groups: Record<string, DailyLogDto[]> = {};
 
     logs.forEach(log => {
       const date = new Date(log.createdAt).toLocaleDateString('tr-TR', {
         day: '2-digit', month: 'long', year: 'numeric'
       });
-
+      
       if (!groups[date]) {
-        groups[date] = { FOOD: [], WATER: [] };
+        groups[date] = [];
       }
-      groups[date][log.dailyLogType].push(log);
+      groups[date].push(log);
     });
 
     return groups;
   }, [logs]);
 
-  // Dış Kutu (Card) her zaman görünür olacak. İçerik duruma göre değişecek.
   return (
     <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[400px]">
       
-      {/* BAŞLIK VE DROPDOWN (Sabit kalır) */}
+      {/* BAŞLIK VE DROPDOWN */}
       <div className="p-4 border-b border-slate-100 flex justify-between items-center shrink-0">
-        <h3 className="font-bold text-slate-700">Yemek & İçecek Günlüğü</h3>
+        <h3 className="font-bold text-slate-700">Günlük Kayıtlar</h3>
         <select 
           value={days}
           onChange={(e) => setDays(Number(e.target.value))}
@@ -64,7 +62,7 @@ export default function DailyLogPanel({ patientId }: DailyLogPanelProps) {
         </select>
       </div>
 
-      {/* İÇERİK ALANI (Scrollable) */}
+      {/* İÇERİK ALANI */}
       <div className="flex-1 overflow-y-auto p-4 custom-scrollbar bg-slate-50/30">
         
         {/* Yükleniyor Durumu */}
@@ -74,49 +72,61 @@ export default function DailyLogPanel({ patientId }: DailyLogPanelProps) {
           </div>
         ) : Object.keys(groupedLogs).length === 0 ? (
           
-          /* Boş Veri Durumu (Placeholder) */
+          /* Boş Veri Durumu */
           <div className="h-full border-2 border-dashed border-slate-200 rounded-xl flex items-center justify-center text-slate-400 text-sm flex-col gap-2">
-            <span className="text-2xl">🍽️</span>
+            <span className="text-2xl">📝</span>
             Seçili tarih aralığında kayıt yok.
           </div>
 
         ) : (
-          /* Veri Var Durumu (Liste) */
+          /* Veri Var Durumu (Tek Tip Liste) */
           <div className="space-y-6">
-            {Object.entries(groupedLogs).map(([date, categories]) => (
+            {Object.entries(groupedLogs).map(([date, dailyLogs]) => (
               <div key={date} className="relative">
+                
+                {/* Tarih Ayırıcı Çizgisi */}
                 <div className="flex items-center gap-3 mb-3">
                   <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider whitespace-nowrap">{date}</span>
                   <div className="h-px bg-slate-200 w-full"></div>
                 </div>
 
-                <div className="space-y-3 pl-1">
-                  {categories.FOOD.length > 0 && (
-                    <div className="space-y-2">
-                      {categories.FOOD.map(log => (
-                        <div key={log.dailyLogId} className="bg-white border border-slate-200 p-2.5 rounded-lg shadow-sm">
-                          <p className="text-sm text-slate-700">{log.description}</p>
-                          <span className="text-[10px] text-slate-400 mt-1 block">
-                            {new Date(log.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  )}
+                {/* O Güne Ait Loglar */}
+                <div className="space-y-2 pl-1">
+                  {dailyLogs.map(log => (
+                    <div key={log.dailyLogId} className="bg-white border border-slate-200 p-3 rounded-xl shadow-sm hover:border-blue-200 transition-colors flex flex-col gap-2">
+                      
+                      {/* Açıklama Varsa Göster */}
+                      {log.description && (
+                        <p className="text-sm text-slate-700 leading-relaxed">
+                          {log.description}
+                        </p>
+                      )}
+                      
+                      {/* Alt Kısım: Miktar ve Saat */}
+                      <div className="flex justify-between items-end mt-1">
+                        
+                        {/* Miktar (Ml) Varsa Göster */}
+                        {log.quantityMl && log.quantityMl > 0 ? (
+                          <div className="flex items-center gap-1 bg-blue-50 border border-blue-100 text-blue-600 px-2 py-1 rounded-md">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="currentColor" stroke="none" className="text-blue-500">
+                              <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                            </svg>
+                            <span className="text-xs font-bold">{log.quantityMl} ml</span>
+                          </div>
+                        ) : (
+                          <div></div> /* Flex-between dengesini korumak için boş div */
+                        )}
 
-                  {categories.WATER.length > 0 && (
-                    <div className="grid grid-cols-2 gap-2 mt-2">
-                      {categories.WATER.map(log => (
-                        <div key={log.dailyLogId} className="bg-blue-50 border border-blue-100 p-2 rounded-lg flex justify-between items-center">
-                          <span className="text-xs font-semibold text-blue-700">{log.quantityMl} ml</span>
-                          <span className="text-[9px] text-blue-400">
-                            {new Date(log.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
-                          </span>
-                        </div>
-                      ))}
+                        {/* Saat (Her zaman en sağda durur) */}
+                        <span className="text-[10px] font-medium text-slate-400 bg-slate-50 px-2 py-0.5 rounded-md border border-slate-100">
+                          {new Date(log.createdAt).toLocaleTimeString('tr-TR', { hour: '2-digit', minute: '2-digit' })}
+                        </span>
+                        
+                      </div>
                     </div>
-                  )}
+                  ))}
                 </div>
+
               </div>
             ))}
           </div>
