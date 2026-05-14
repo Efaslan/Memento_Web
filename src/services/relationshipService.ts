@@ -7,7 +7,7 @@ export const relationshipService = {
     const payload: RelationshipRequestDto = {
       targetEmail: data.email,
       relationshipType: 'DOCTOR',
-      isPrimaryContact: true
+      isPrimaryContact: false
     };
 
     const response = await api.post<RelationshipResponseDto>('/relationships', payload);

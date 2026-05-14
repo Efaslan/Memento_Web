@@ -73,7 +73,7 @@ api.interceptors.response.use(
 
     const originalRequest = error.config;
     const status = error.response.status;
-    const backendMessage = error.response.data?.message;
+    const backendMessage = error.response.data?.message || error.response.data;
 
     if (typeof backendMessage === 'string' && backendResponseDictionary[backendMessage]) {
       // look up from the dictionary and show user-friendly message if exists

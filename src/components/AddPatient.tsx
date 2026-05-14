@@ -25,7 +25,7 @@ export default function AddPatient({ onClose, onSuccess }: AddPatientProps) {
       onClose(); // İşlem bitince baloncuğu kapat
     } catch (err) {
       console.error("Hasta ekleme hatası:", err);
-      toast.error("Hasta eklenirken bir hata oluştu. Kodu kontrol edin.");
+      toast.error("Hasta eklenirken bir hata oluştu.");
     } finally {
       setIsLoading(false);
     }
