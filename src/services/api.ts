@@ -11,7 +11,7 @@ const backendResponseDictionary: Record<string, string> = {
   "PASSWORD_MUST_BE_MIN_8_MAX_30_CHARACTERS": "Şifreniz çok kısa, lütfen en az 8 karakter kullanın.",
   "Your password must contain at least one uppercase letter, one lowercase letter, one digit, and one special character.": "Şifreniz büyük harf, küçük harf, rakam ve özel karakter içermelidir.",
   "YOU_CAN_ONLY_MODIFY_YOUR_OWN_OR_CREATED_REMINDERS": "Sadece kendi oluşturduğunuz hatırlatmaları düzenleyebilirsiniz.",
-
+  "Incorrect email or password.": "Yanlış email veya şifre.",
 
 };
 
@@ -67,7 +67,7 @@ api.interceptors.response.use(
   async (error) => {
 
     if (!error.response) {
-      toast.error("Sunucuya ulaşılamıyor. Lütfen bağlantınızı kontrol edin.");
+      toast.error("Sunucuya ulaşılamıyor veya çok fazla deneme yaptınız. Lütfen biraz sonra tekrar deneyiniz.");
       return Promise.reject(error);
     }
 
@@ -131,10 +131,13 @@ api.interceptors.response.use(
           isRefreshing = false;
         }
       }
-      else if (status === 400 || status === 403 || status === 404 || status === 409) {
-        const userFriendlyMessage = backendResponseDictionary[backendMessage] || backendMessage;
-        toast.error(userFriendlyMessage);
-      }
+      else if ([400, 401, 403, 404, 409].includes(status)) {
+      
+      // Mesajı sözlükten bulmaya çalış
+      let userFriendlyMessage = typeof backendMessage === 'string' ? backendResponseDictionary[backendMessage] : null;
+
+      toast.error(userFriendlyMessage);
+    }
       else if (status === 429) {
         toast.error("Çok fazla deneme yaptınız. Lütfen daha sonra tekrar deneyin.");
       }

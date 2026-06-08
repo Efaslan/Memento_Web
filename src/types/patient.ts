@@ -73,7 +73,7 @@ export interface MedicationScheduleRequestDto {
   dosage: string;
   notes?: string;
   startDate: string; // LocalDate JavaScript'e String ('YYYY-MM-DD') olarak gelir
-  endDate: string;   // LocalDate JavaScript'e String ('YYYY-MM-DD') olarak gelir
+  endDate?: string;   // LocalDate JavaScript'e String ('YYYY-MM-DD') olarak gelir
   isPrn: boolean;
   times: string[];   // LocalTime JavaScript'e String ('HH:mm') olarak gelir
 }

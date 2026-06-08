@@ -63,6 +63,6 @@ export const doctorService = {
   },
 
   deactivateMedicationSchedule: async (scheduleId: number): Promise<void> => {
-    await api.delete(`/medications/schedules/${scheduleId}`);
+    await api.patch(`/medications/schedules/${scheduleId}/deactivate`);
   }
 };

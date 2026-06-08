@@ -46,7 +46,7 @@ export default function DailyLogPanel({ patientId }: DailyLogPanelProps) {
   }, [logs]);
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[400px]">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-100">
       
       {/* BAŞLIK VE DROPDOWN */}
       <div className="p-4 border-b border-slate-100 flex justify-between items-center shrink-0">

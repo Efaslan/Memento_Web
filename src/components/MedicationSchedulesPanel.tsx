@@ -55,9 +55,14 @@ export default function MedicationSchedulesPanel({ patientId }: MedicationSchedu
 
   const renderMedicationCard = (schedule: MedicationScheduleResponseDto) => {
     // TypeScript artık schedule.times'ın bir dizi olduğunu bildiği için doğrudan map kullanabiliriz
-    const timeDisplay = schedule.times && schedule.times.length > 0
-      ? schedule.times.map(t => t.time.substring(0, 5)).join(', ') 
-      : 'Saat belirtilmemiş';
+    const timeDisplay = schedule.isPrn 
+      ? 'İhtiyaç Halinde'
+      : (Array.isArray(schedule.times) && schedule.times.length > 0)
+        ? schedule.times
+            .filter(t => t && t.time) // Sadece time string'i dolu olanları al
+            .map(t => t.time.substring(0, 5))
+            .join(', ') || 'Saat belirtilmemiş' // Eğer filtreden sonra boş kalırsa
+        : 'Saat belirtilmemiş';
 
     return (
       <div key={schedule.scheduleId} className="relative bg-white border border-slate-200 p-3.5 rounded-xl shadow-sm hover:border-indigo-300 transition-colors flex gap-3 overflow-hidden">
@@ -78,7 +83,7 @@ export default function MedicationSchedulesPanel({ patientId }: MedicationSchedu
         )}
 
         {/* İlaç İkonu */}
-        <div className="flex-shrink-0 mt-1">
+        <div className="shrink-0 mt-1">
           <div className="w-10 h-10 rounded-full bg-indigo-50 flex items-center justify-center text-indigo-600">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
               <path d="M10.5 20.5 19 12a2.828 2.828 0 0 0-4-4L6.5 16.5a2.828 2.828 0 0 0 4 4z"></path><path d="m12 12 4.5 4.5"></path><path d="m4.5 4.5 1 1"></path><path d="m4.5 4.5 3 3"></path>
@@ -125,7 +130,7 @@ export default function MedicationSchedulesPanel({ patientId }: MedicationSchedu
           <div className="flex items-center justify-between mt-3 text-[10px] text-slate-400">
             <div className="flex items-center gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg>
-              {schedule.startDate} - {schedule.endDate}
+              {"Başlangıç: " + schedule.startDate} - {"Bitiş: " + (schedule.endDate || "Belli değil.")}
             </div>
             <div className="flex items-center gap-1">
               <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path><circle cx="12" cy="7" r="4"></circle></svg>
@@ -138,7 +143,7 @@ export default function MedicationSchedulesPanel({ patientId }: MedicationSchedu
   };
 
   return (
-    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-[400px]">
+    <div className="bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col h-100">
       
       {/* ÜST KISIM */}
       <div className="px-4 pt-4 border-b border-slate-100 shrink-0">
